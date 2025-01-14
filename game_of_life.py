@@ -2,6 +2,7 @@
 
 import time
 import random
+import keyboard
 
 def add_case(matrice, x, y):
     matrice[x][y] = 1
@@ -74,7 +75,52 @@ def next_matrice(matrice):
                     new_matrice[i][j] = 0
     return new_matrice
 
+def menu():
 
+    choix = 1
+    boucle=True
+    
+    while boucle==False :
+        if choix == 1:
+            print("-> 1. Lancer la simulation")
+            print("   2. Paramètres")
+            print("   3. Quitter")
+        elif choix == 2:
+            print("   1. Lancer la simulation")
+            print("-> 2. Paramètres")
+            print("   3. Quitter")
+        elif choix == 3:
+            print("   1. Lancer la simulation")
+            print("   2. Paramètres")
+            print("-> 3. Quitter")
+    
+        
+        print("\nUtilisez les flèches directionnelles pour choisir une option")
+        print("Appuyez sur entrée pour valider")
+        
+        touche = keyboard.read_key()
+        
+        if touche == "H":
+            if choix == 1:
+                choix = 3
+            else:
+                choix -= 1
+        
+        elif touche == "P":
+            if choix == 3:
+                choix = 1
+            else:
+                choix += 1
+                
+        elif touche == "Enter":
+            if choix == 1:
+                main()
+            elif choix == 2:
+                print("Paramètres")
+            elif choix == 3:
+                boule=False
+                print("Au revoir")
+    
 
 def main():
     test=False
@@ -119,7 +165,5 @@ def main():
             matrice = next_matrice(matrice)
             print("\nLa matrice est vide, la génération s'arrête")
             x=nbCycle
-        
-        
     
-main()
+menu()
