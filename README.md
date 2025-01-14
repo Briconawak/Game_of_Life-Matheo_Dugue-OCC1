@@ -1,1 +1,1 @@
-# Workshop1_Decentralized_Technologie
+# Workshop1_Decentralized_Technologies
