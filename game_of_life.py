@@ -1,70 +1,46 @@
-# Description: Jeu de la vie de Conway
-
-import time
 import random
-import keyboard
-
-def add_case(matrice, x, y):
-    matrice[x][y] = 1
-    return matrice
 
 def create_matrice(n):
-    matrice = []
-    for i in range(n):
-        matrice.append([0]*n)
-    return matrice
+    return [[0]*n for _ in range(n)]
 
 def fill_random_matrice(matrice):
-    for i in range(len(matrice)):
-        for j in range(len(matrice)):
+    n = len(matrice)
+    for i in range(n):
+        for j in range(n):
             matrice[i][j] = random.randint(0, 1)
     return matrice
 
 def print_matrice(matrice):
-    print("+" + "-"*len(matrice)*2 + "+")
-    for i in range(len(matrice)):
+    n = len(matrice)
+    print("+" + "-"*n*2 + "+")
+    for i in range(n):
         print("|", end="")
-        for j in range(len(matrice)):
-            if matrice[i][j] == 1:
-                print("■", end=" ")
-            else:
-                print(" ", end=" ")
+        for j in range(n):
+            print("■" if matrice[i][j] == 1 else " ", end=" ")
         print("|")
-    print("+" + "-"*len(matrice)*2 + "+")
-        
-        
+    print("+" + "-"*n*2 + "+")
+
 def count_neighbours(matrice, x, y):
     neighbours = 0
+    n = len(matrice)
     for i in range(-1, 2):
         for j in range(-1, 2):
-            if x+i >= 0 and x+i < len(matrice) and y+j >= 0 and y+j < len(matrice):
-                if matrice[x+i][y+j] == 1:
-                    neighbours += 1
+            if x + i >= 0 and x + i < n and y + j >= 0 and y + j < n:
+                neighbours += matrice[x + i][y + j]
+    neighbours -= matrice[x][y]  # Remove the cell itself from the count
     return neighbours
 
-def count_number_of_ones(matrice):
-    count = 0
-    for i in range(len(matrice)):
-        for j in range(len(matrice)):
-            if matrice[i][j] == 1:
-                count += 1
-    return count
-
 def is_matrice_empty(matrice):
-    if count_number_of_ones(matrice) == 0 :
-        return True
-    else:
-        return False
+    return all(all(cell == 0 for cell in row) for row in matrice)
 
 def next_matrice(matrice):
-    new_matrice = create_matrice(len(matrice))
-    new_matrice_neighbours = create_matrice(len(matrice))
-    for i in range(len(matrice)):
-        for j in range(len(matrice)):
+    n = len(matrice)
+    new_matrice = create_matrice(n)
+    for i in range(n):
+        for j in range(n):
             neighbours = count_neighbours(matrice, i, j)
-            new_matrice_neighbours[i][j] = neighbours
             if matrice[i][j] == 1:
-                if neighbours ==3 :
+                if neighbours == 2 or neighbours == 3:
                     new_matrice[i][j] = 1
                 else:
                     new_matrice[i][j] = 0
@@ -76,94 +52,62 @@ def next_matrice(matrice):
     return new_matrice
 
 def menu():
-
-    choix = 1
-    boucle=True
-    
-    while boucle==False :
-        if choix == 1:
-            print("-> 1. Lancer la simulation")
-            print("   2. Paramètres")
-            print("   3. Quitter")
-        elif choix == 2:
-            print("   1. Lancer la simulation")
-            print("-> 2. Paramètres")
-            print("   3. Quitter")
-        elif choix == 3:
-            print("   1. Lancer la simulation")
-            print("   2. Paramètres")
-            print("-> 3. Quitter")
-    
+    while True:
+        print("\n=== Menu ===")
+        print("1. Lancer la simulation")
+        print("2. Paramètres")
+        print("3. Quitter")
         
-        print("\nUtilisez les flèches directionnelles pour choisir une option")
-        print("Appuyez sur entrée pour valider")
+        choix = input("Choisissez une option (1-3) : ").strip()
         
-        touche = keyboard.read_key()
-        
-        if touche == "H":
-            if choix == 1:
-                choix = 3
-            else:
-                choix -= 1
-        
-        elif touche == "P":
-            if choix == 3:
-                choix = 1
-            else:
-                choix += 1
-                
-        elif touche == "Enter":
-            if choix == 1:
-                main()
-            elif choix == 2:
-                print("Paramètres")
-            elif choix == 3:
-                boule=False
-                print("Au revoir")
-    
+        if choix == "1":
+            main()
+        elif choix == "2":
+            print("\nParamètres :")
+            print("Pas de paramètres configurables pour l'instant.")
+        elif choix == "3":
+            print("\nAu revoir !")
+            break
+        else:
+            print("\nOption invalide. Veuillez réessayer.")
 
 def main():
-    test=False
-    while test == False:
+    # Saisie de la taille de la matrice avec limite à 20
+    while True:
         try:
-            n = int(input("Quelle taille de matrice souhaitez-vous (taille nxn) ? \n"))
-            if n > 0:
-                test = True
+            n = int(input("Quelle taille de matrice souhaitez-vous (taille nxn, max 20) ?\n"))
+            if 1 <= n <= 20:
+                break
             else:
-                print("Veuillez entrer un nombre positif")
+                print("Veuillez entrer une valeur entre 1 et 20.")
         except ValueError:
-            print("Veuillez entrer un nombre positif")
-            test=False
-            
-    test = False
-    while test == False:
-        try:
-            nbCycle = int(input("Combien de génération souhaitez-vous ? \n"))
-            if nbCycle > 0:
-                test = True
-            else:
-                print("Veuillez entrer un nombre positif")
-        except ValueError:
-            print("Veuillez entrer un nombre positif")
-            test=False
+            print("Veuillez entrer un nombre valide.")
 
+    # Saisie du nombre de générations avec limite à 100
+    while True:
+        try:
+            nbCycle = int(input("Combien de générations souhaitez-vous (max 100) ?\n"))
+            if 1 <= nbCycle <= 100:
+                break
+            else:
+                print("Veuillez entrer une valeur entre 1 et 100.")
+        except ValueError:
+            print("Veuillez entrer un nombre valide.")
+
+    # Création et remplissage aléatoire de la matrice
     matrice = create_matrice(n)
     matrice = fill_random_matrice(matrice)
     
-    x=0
-    
-    while x < nbCycle: 
-        
-        print("\n\ngénération n°", x)
+    for x in range(nbCycle):
+        print(f"\n\nGénération n° {x + 1}")
         print_matrice(matrice)
-        matrice = next_matrice(matrice)
-        time.sleep(1)
-        x+=1
         if is_matrice_empty(matrice):
-            print("\n\ngénération n°", x)
-            print_matrice(matrice)
-            matrice = next_matrice(matrice)
-            print("\nLa matrice est vide, la génération s'arrête")
-            x=nbCycle
-    
+            print("\nLa matrice est vide, la simulation s'arrête.")
+            break
+        
+        matrice = next_matrice(matrice)
+        
+        # Demander à l'utilisateur d'appuyer sur Entrée pour passer à la génération suivante
+        input("\nAppuyez sur Entrée pour passer à la génération suivante.")
+
 menu()
